@@ -25,33 +25,32 @@ function reducer(state = initState,{type,payload}){
             }
             return{...state}
         }
-        case "CALCULATE":{
-            const inplen = state.inputs.length;
-            if(operators.includes(state.inputs.slice(inplen-1,inplen))){
-                try {
-                    const result = eval(state.inputs);
-                    if(!Number.isfinite(result)){
-                        throw new error ("Cannot divide by zero");
-                    };
-                    const newInp = {
-                        ...state,
-                        res: "",
-                        inputs: result.toString()
-                    }
-                    return newInp;
+        case "CALCULATE": {
+            try {
+                const inplen = state.inputs.length;
+                if (operators.includes(state.inputs.slice(inplen - 1, inplen))) {
+                    return { ...state, res: "Invalid Expression" };
                 }
-                catch (error){
-                    console.log(error)
+        
+                const result = eval(state.inputs);
+                if (!isFinite(result)) {
+                    throw new Error("Cannot divide by zero");
                 }
-            }
-            else{
-                return{
+        
+                return {
                     ...state,
-                    inputs: eval(state.inputs.slice(0,inplen-1)).toString(),
-                    res:""
-                }
+                    inputs: result.toString(),
+                    res: "",
+                };
+            } catch (error) {
+                console.error(error.message);
+                return {
+                    ...state,
+                    res: "Error",
+                };
             }
         }
+        
         case "DELETE":{
             return{
                 ...state,inputs:state.inputs.slice(0,state.inputs.length-1)
@@ -91,8 +90,8 @@ const Calculator = () => {
         <div>{state.inputs}</div>
       </div>
       <div className="calculator-keys">
-        <button className="key" onClick={handleClear}>AC</button>
-        <button className="key" onClick={handleDel}>DEL</button>
+        <button className="key key-clear" onClick={handleClear}>AC</button>
+        <button className="key key-delete" onClick={handleDel}>DEL</button>
         <button className="key" onClick={()=>handleClick("1")}>1</button>
         <button className="key" onClick={()=>handleClick("*")}>*</button>
         <button className="key" onClick={()=>handleClick("2")}>2</button>
